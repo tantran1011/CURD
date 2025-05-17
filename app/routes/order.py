@@ -23,11 +23,12 @@ def create_order(order: CreateOrder, db: Session = Depends(get_db)):
     total_price = existing_product.price * order.quantity
     
     # Create a new order instance
+    payment_method = order.payment_method or "CASH"
     new_order = Order(
         user_id=order.user_id,
         product_id=order.product_id,
-        total_price=total_price
-        
+        total_price=total_price,
+        payment_method=payment_method
     )
     
     # Add the new order to the database
@@ -40,7 +41,8 @@ def create_order(order: CreateOrder, db: Session = Depends(get_db)):
         product_id=new_order.product_id,
         total_price=new_order.total_price,
         order_day=new_order.order_day.strftime("%Y-%m-%d %H:%M:%S"),
-        quantity=order.quantity
+        quantity=order.quantity,
+        payment_method=new_order.payment_method
     )
 
 

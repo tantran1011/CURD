@@ -62,7 +62,7 @@ class CreateOrder(BaseModel):
     user_id: int
     product_id: int
     quantity: int
-    payment_method: PaymentMethod
+    payment_method: PaymentMethod = PaymentMethod.CASH
 
 class InsertOrder(BaseModel):
     id: int

@@ -37,16 +37,6 @@ def insert_order(order: InsertOrder,db: Session = Depends(get_db)):
     }
 
 
-@router.get('/{id}')
-def get_order_items(db: Session = Depends(get_db)):
-    # Get all orders from the database
-    order = db.query(OrderItem).filter(OrderItem.order_id == id).first()
-    if not order:
-        raise HTTPException(status_code=404, detail="No order found")
-    
-    return {"data": order}
-
-
 @router.get('/')
 def get_all_orders(db: Session = Depends(get_db)):
     # Get all orders from the database
@@ -113,3 +103,13 @@ def churn_rate(db: Session = Depends(get_db)):
         "churned_users": len(churned_users),
         "total_users": len(users_with_orders)
     }
+
+
+@router.get('/{id}')
+def get_order_items(db: Session = Depends(get_db)):
+    # Get all orders from the database
+    order = db.query(OrderItem).filter(OrderItem.order_id == id).first()
+    if not order:
+        raise HTTPException(status_code=404, detail="No order found")
+    
+    return {"data": order}
