@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from app.config import get_db
 from app.models.database import Order, OrderItem, Products
 from sqlalchemy.orm import Session
-from app.models.user import InsertOrder
+from app.models.schemas import InsertOrder
 from datetime import datetime, timedelta
 
 

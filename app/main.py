@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.routes import auth, product, order, insert
+from app.routes import auth, product, order, insert, categories
 import os
 from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
@@ -22,6 +22,7 @@ app.add_middleware(
 
 app.include_router(auth.router, prefix='/auth', tags=['auth'])
 app.include_router(product.router, prefix='/products', tags=['products'])
+app.include_router(categories.router, prefix='/categories', tags=['categories'])
 app.include_router(order.router, prefix='/orders', tags=['orders'])
 app.include_router(insert.router, prefix='/insert', tags=['insert'])
 

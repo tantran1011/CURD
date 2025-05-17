@@ -30,11 +30,12 @@ class UserResponse(BaseModel):
 
 """Products and Category models"""
 class UpProduct(BaseModel):
-    name: str
-    price: int
-    size: str
-    quantity: int
-    color: str 
+    name: str 
+    price: int 
+    size: str 
+    quantity: int 
+    color: str
+    category_id: int
 
 class ProductResponse(BaseModel):
     name: str
@@ -42,6 +43,7 @@ class ProductResponse(BaseModel):
     size: str
     quantity: int
     color: str
+    category_id: int
 
 class UpCategory(BaseModel):
     name: str
