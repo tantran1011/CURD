@@ -1,9 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from app.config import get_db
-from app.models.database import Order, OrderItem, Products, User
+from app.models.database import Order, Products, User
 from sqlalchemy.orm import Session
 from app.models.user import OrderResponse, CreateOrder
-from datetime import datetime
 
 
 router = APIRouter()
@@ -45,6 +44,14 @@ def create_order(order: CreateOrder, db: Session = Depends(get_db)):
     )
 
 
+@router.get('/')
+def get_all_orders(db: Session = Depends(get_db)):      
+    # Get all orders from the database
+    orders = db.query(Order).all()
+    
+    return {"data": orders}
+
+
 @router.get('/{order_id}')
 def get_order(order_id: int, db: Session = Depends(get_db)):
     # Check if the order exists
@@ -53,14 +60,6 @@ def get_order(order_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Order not found")
     
     return existing_order
-
-
-@router.get('/')
-def get_all_orders(db: Session = Depends(get_db)):      
-    # Get all orders from the database
-    orders = db.query(Order).all()
-    
-    return {"data": orders}
 
 
 @router.delete('/{order_id}')

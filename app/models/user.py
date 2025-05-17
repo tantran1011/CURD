@@ -1,4 +1,5 @@
-from pydantic import BaseModel 
+from pydantic import BaseModel
+from enum import Enum 
 
 """User models for registration and login."""
 class Register(BaseModel):
@@ -52,10 +53,16 @@ class CategoryResponse(BaseModel):
 
 
 """Order models"""
+
+class PaymentMethod(str, Enum):
+    CASH = "CASH"
+    ONLINE = "ONLINE"
+
 class CreateOrder(BaseModel):
     user_id: int
     product_id: int
     quantity: int
+    payment_method: PaymentMethod
 
 class InsertOrder(BaseModel):
     id: int
@@ -66,4 +73,4 @@ class OrderResponse(BaseModel):
     total_price: int
     order_day: str
     quantity: int
-
+    payment_method: str

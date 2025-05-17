@@ -53,6 +53,7 @@ class Order(Base):
     product_id = Column(Integer, ForeignKey('products.id'))
     total_price = Column(Integer)
     order_day = Column(DateTime, default=datetime.now)
+    payment_method = Column(String, nullable=False)
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
 

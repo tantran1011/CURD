@@ -33,10 +33,11 @@ def add_product(product: UpProduct, db: Session = Depends(get_db)):
         size=new_product.size,
         quantity=new_product.quantity,
         color=new_product.color,
+        payment_method=new_product.payment_method
     )
 
 
-@router.get('/search', response_model=list[ProductResponse])
+@router.get('/', response_model=list[ProductResponse])
 def search_product(db: Session = Depends(get_db), q: str = Query(None), min_price: int = Query(None), max_price: int = Query(None),
                    size: str = Query(None), color: str = Query(None), category_id: int = Query(None), in_stock: bool = Query(None),):
 
@@ -62,6 +63,16 @@ def search_product(db: Session = Depends(get_db), q: str = Query(None), min_pric
     return query.all()
 
 
+@router.get('/')
+def get_all_products(db: Session = Depends(get_db)):
+    # Get all products from the database
+    products = db.query(Products).all()
+    if not products:
+        raise HTTPException(status_code=404, detail="No products found")
+    
+    return products
+
+
 @router.get('/{product_id}', response_model=ProductResponse)
 def get_product(product_id: int, db: Session = Depends(get_db)):
     # Check if the product exists
@@ -76,16 +87,6 @@ def get_product(product_id: int, db: Session = Depends(get_db)):
         quantity=existing_product.quantity,
         color=existing_product.color,
     )
-
-
-@router.get('/')
-def get_all_products(db: Session = Depends(get_db)):
-    # Get all products from the database
-    products = db.query(Products).all()
-    if not products:
-        raise HTTPException(status_code=404, detail="No products found")
-    
-    return products
 
 
 @router.put('/{product_id}', response_model=ProductResponse)
@@ -153,19 +154,6 @@ def add_category(category: UpCategory, db: Session = Depends(get_db)):
     )
 
 
-@router.get('/{category_id}', response_model=CategoryResponse)
-def get_category(category_id: int, db: Session = Depends(get_db)):
-    # Check if the category exists
-    existing_category = db.query(Category).filter(Category.id == category_id).first()
-    if not existing_category:
-        raise HTTPException(status_code=404, detail="Category not found")
-    
-    return CategoryResponse(
-        name=existing_category.name,
-        discount_percentage=existing_category.discount_percentage
-    )
-
-
 @router.get('/', response_model=list[CategoryResponse])
 def get_all_categories(db: Session = Depends(get_db)):
     # Get all categories from the database
@@ -178,6 +166,40 @@ def get_all_categories(db: Session = Depends(get_db)):
         discount_percentage=category.discount_percentage
     ) for category in categories]
 
+
+@router.get('/', response_model=list[ProductResponse])
+def get_product_by_category(category_id: int, db: Session = Depends(get_db)):
+    # Check if the category exists
+    existing_category = db.query(Category).filter(Category.id == category_id).first()
+    if not existing_category:
+        raise HTTPException(status_code=404, detail="Category not found")
+    
+    # Get all products in the specified category
+    products = db.query(Products).filter(Products.category_id == category_id).all()
+    if not products:
+        raise HTTPException(status_code=404, detail="No products found in this category")
+    
+    return [ProductResponse(
+        name=product.name,
+        price=product.price,
+        size=product.size,
+        quantity=product.quantity,
+        color=product.color,
+        category_id=product.category_id
+    ) for product in products]
+
+
+@router.get('/{category_id}', response_model=CategoryResponse)
+def get_category(category_id: int, db: Session = Depends(get_db)):
+    # Check if the category exists
+    existing_category = db.query(Category).filter(Category.id == category_id).first()
+    if not existing_category:
+        raise HTTPException(status_code=404, detail="Category not found")
+    
+    return CategoryResponse(
+        name=existing_category.name,
+        discount_percentage=existing_category.discount_percentage
+    )
 
 
 @router.put('/{category_id}', response_model=CategoryResponse)
@@ -212,25 +234,3 @@ def delete_category(category_id: int, db: Session = Depends(get_db)):
     db.commit()
 
     return {"detail": "Category deleted successfully"}
-
-
-router.get('/', response_model=list[ProductResponse])
-def get_product_by_category(category_id: int, db: Session = Depends(get_db)):
-    # Check if the category exists
-    existing_category = db.query(Category).filter(Category.id == category_id).first()
-    if not existing_category:
-        raise HTTPException(status_code=404, detail="Category not found")
-    
-    # Get all products in the specified category
-    products = db.query(Products).filter(Products.category_id == category_id).all()
-    if not products:
-        raise HTTPException(status_code=404, detail="No products found in this category")
-    
-    return [ProductResponse(
-        name=product.name,
-        price=product.price,
-        size=product.size,
-        quantity=product.quantity,
-        color=product.color,
-        category_id=product.category_id
-    ) for product in products]
