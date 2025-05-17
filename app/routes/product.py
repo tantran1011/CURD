@@ -36,22 +36,6 @@ def add_product(product: UpProduct, db: Session = Depends(get_db)):
     )
 
 
-@router.get('/{product_id}', response_model=ProductResponse)
-def get_product(product_id: int, db: Session = Depends(get_db)):
-    # Check if the product exists
-    existing_product = db.query(Products).filter(Products.id == product_id).first()
-    if not existing_product:
-        raise HTTPException(status_code=404, detail="Product not found")
-    
-    return ProductResponse(
-        name=existing_product.name,
-        price=existing_product.price,
-        size=existing_product.size,
-        quantity=existing_product.quantity,
-        color=existing_product.color,
-    )
-
-
 @router.get('/search', response_model=list[ProductResponse])
 def search_product(db: Session = Depends(get_db), q: str = Query(None), min_price: int = Query(None), max_price: int = Query(None),
                    size: str = Query(None), color: str = Query(None), category_id: int = Query(None), in_stock: bool = Query(None),):
@@ -76,6 +60,22 @@ def search_product(db: Session = Depends(get_db), q: str = Query(None), min_pric
             query = query.filter(Products.quantity == 0) 
 
     return query.all()
+
+
+@router.get('/{product_id}', response_model=ProductResponse)
+def get_product(product_id: int, db: Session = Depends(get_db)):
+    # Check if the product exists
+    existing_product = db.query(Products).filter(Products.id == product_id).first()
+    if not existing_product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    
+    return ProductResponse(
+        name=existing_product.name,
+        price=existing_product.price,
+        size=existing_product.size,
+        quantity=existing_product.quantity,
+        color=existing_product.color,
+    )
 
 
 @router.get('/')
