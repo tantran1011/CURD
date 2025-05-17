@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from app.models.user import UpProduct, ProductResponse, UpCategory, CategoryResponse
 from app.config import get_db
 from app.models.database import Products, Category
@@ -50,6 +50,32 @@ def get_product(product_id: int, db: Session = Depends(get_db)):
         quantity=existing_product.quantity,
         color=existing_product.color,
     )
+
+
+@router.get('/search', response_model=list[ProductResponse])
+def search_product(db: Session = Depends(get_db), q: str = Query(None), min_price: int = Query(None), max_price: int = Query(None),
+                   size: str = Query(None), color: str = Query(None), category_id: int = Query(None), in_stock: bool = Query(None),):
+
+    query = db.query(Products)
+    if q:
+        query = query.filter(Products.name.ilike(f"%{q}%"))
+    if min_price:
+        query = query.filter(Products.price >= min_price)
+    if max_price:
+        query = query.filter(Products.price <= max_price)
+    if size:
+        query = query.filter(Products.size.ilike(f"%{size}%"))
+    if color:
+        query = query.filter(Products.color.ilike(f"%{color}%"))
+    if category_id:
+        query = query.filter(Products.category_id == category_id)
+    if in_stock is not None:    
+        if in_stock:
+            query = query.filter(Products.quantity > 0)
+        else:
+            query = query.filter(Products.quantity == 0) 
+
+    return query.all()
 
 
 @router.get('/')
