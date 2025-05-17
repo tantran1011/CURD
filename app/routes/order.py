@@ -1,14 +1,15 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from app.config import get_db
 from app.models.database import Order, Products, User
 from sqlalchemy.orm import Session
 from app.models.schemas import OrderResponse, CreateOrder
+from app.backgroundtasks.bgtasks import send_email_confirmation
 
 
 router = APIRouter()
 
 @router.post('/', response_model=OrderResponse)
-def create_order(order: CreateOrder, db: Session = Depends(get_db)):
+def create_order(background_tasks: BackgroundTasks, order: CreateOrder, db: Session = Depends(get_db)):
     # Check if the user exists
     existing_user = db.query(User).filter(User.id == order.user_id).first()
     if not existing_user:
@@ -21,7 +22,18 @@ def create_order(order: CreateOrder, db: Session = Depends(get_db)):
     
     # Calculate total price
     total_price = existing_product.price * order.quantity
-    
+
+    # Background task to send email confirmation
+    background_tasks.add_task(
+        send_email_confirmation,
+        email=existing_user.email,
+        order_id=order.product_id,
+        body=[{
+            "Product Name": existing_product.name,
+            "Quantity": order.quantity,
+            "Total Price": total_price
+        }]
+    )
     # Create a new order instance
     payment_method = order.payment_method or "CASH"
     new_order = Order(
