@@ -403,6 +403,37 @@ Response Body:
 ]
 ```
 
+- To get all catgories:
+```yaml
+API: http://127.0.0.1:8000/categories/
+
+Response Body:
+{
+  "data": [
+    {
+      "id": 1,
+      "name": "Shoes",
+      "discount_percentage": 10
+    },
+    {
+      "id": 2,
+      "name": "Shirt",
+      "discount_percentage": 0
+    },
+    {
+      "id": 3,
+      "name": "Pants",
+      "discount_percentage": 20
+    },
+    {
+      "id": 4,
+      "name": "Dress",
+      "discount_percentage": 0
+    }
+  ]
+}
+```
+
 ---
 
 # 🔥 Question 5.2: Fetches a list of products that belong to a specific category
