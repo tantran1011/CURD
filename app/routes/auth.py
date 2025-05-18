@@ -43,9 +43,9 @@ def login_user(user: Login, db: Session = Depends(get_db)):
 
 
 @router.put('/update', response_model=UserResponse)
-def update_user(user: UpdateUser, db: Session = Depends(get_db)):
+def update_user(id: int, user: UpdateUser, db: Session = Depends(get_db)):
     # Check if the user exists
-    existing_user = db.query( User).filter(User.name == user.username).first()
+    existing_user = db.query( User).filter(User.id == id).first()
     if not existing_user:
         raise HTTPException(status_code=400, detail="User not found")
     
