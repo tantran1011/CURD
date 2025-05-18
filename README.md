@@ -548,6 +548,18 @@ tech_db=> select * from orders;
 - Having many methods: Sendgrid, smtplib, Ouath2, ... But in this Technical Assessment, I will use the **BackGroundTasks** to simulate the progress. 
 
 - To review funtion: Tech-Assesment-Code/CRUD-main/app/routes/order.py (create_order) (# Background task to send email confirmation)
+```python
+background_tasks.add_task(
+        send_email_confirmation,
+        email=existing_user.email,
+        order_id=order.product_id,
+        body=[{
+            "Product Name": existing_product.name,
+            "Quantity": order.quantity,
+            "Total Price": total_price
+        }]
+    )
+```
 
 - Send email function (/app/backgroundtasks/bgtasks.py):
 ```python
